@@ -1,9 +1,18 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
-
+import jxl.Workbook;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
 
 public class SRES {
 	public int lambda; // the number of the population
@@ -15,7 +24,6 @@ public class SRES {
 	public int trytimes; // when mutation result beyond the upper or the
 	// lower
 	// bound, the retried times
-	public double pf;
 	public int runtimes; // the times of es algorithm will be executed
 	public int MaxGen; // maximun of generation
 	public double x[][]; // individuals and at last will be solutions
@@ -38,8 +46,6 @@ public class SRES {
 	public double accurate;
 	public Random rand;
 	public int feasibleRun;
-//	public double weights[];
-//	public int numberOfConstrained[];
 	
 	public double currentMin;
 	public int minIndex;
@@ -64,15 +70,22 @@ public class SRES {
 	public double x_[][];
 	public double probability[];
 	public double common;
+	
+	public WritableWorkbook book;
+	public WritableSheet sheet1;
+	public WritableSheet sheet2;
+	public WritableSheet sheet3;
+	public static int sheet1Row;
+	public static int sheet1Column;
+	public static int sheet2Row;
+	public static int sheet2Column;
+	public static int sheet3Row;
+	public static int sheet3Column;
+	public FileWriter fw;
+	public BufferedWriter bw;
+	public DecimalFormat dformat;
 	//public int equalIndex[] = {3,5,11,12,13,14,15,17,21,22,23};
-	public int equalIndex[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,23,24,26,27,28,30};
-	
-//	public double newX[][];
-//	public double newF[];
-//	public double newPhi[][];
-//	public double newPhiAll[];
-//	public double newEta[][];
-	
+	public int equalIndex[] = {1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,23,24};
 	public double a20[] = { 0.0693, 0.0577, 0.05, 0.2, 0.26, 0.55, 0.06, 0.1,
 			0.12, 0.18, 0.1, 0.09, 0.0693, 0.0577, 0.05, 0.2, 0.26, 0.55, 0.06,
 			0.1, 0.12, 0.18, 0.1, 0.09 };
@@ -95,16 +108,12 @@ public class SRES {
 			{ 1, 2, 3, 4, 5 }, { 1, 1, 1, 1, 1 } };
 	public double b19[] = { -40, -2, -0.25, -4, -4, -1, -40, -60, 5, 1 };
 
-	
-	public double o25[]={0.030858718087483,	-0.078632292353156,	0.048651146638038,-0.069089831066354,-0.087918542941928,0.088982639811141,0.074143235639847,-0.086527593580149,-0.020616531903907,0.055586106499231,0.059285954883598,	-0.040671485554685,-0.087399911887693,-0.01842585125741,-0.005184912793062,-0.039892037937026,0.036509229387458,0.026046414854433,-0.067133862936029,0.082780189144943,-0.049336722577062,0.018503188080959,0.051610619131255,0.018613117768432,0.093448598181657,-0.071208840780873,-0.036535677894572,-0.03126128526933,0.099243805247963,0.053872445945574};
-	public double o26[]={-0.066939099286697,0.470966419894494,	-0.490528349401176,-0.312203454689423,-0.124759576300523,-0.247823908806285,-0.448077079941866,0.326494954650117,0.493435908752668,0.061699778818925,-0.30251101183711,	-0.274045146932175,-0.432969960330318,0.062239193145781,-0.188163731545079,-0.100709842052095,-0.333528971180922,-0.496627672944882,-0.288650116941944,0.435648113198148,-0.348261107144255,0.456550427329479,-0.286843419772511,0.145639015401174,-0.038656025783381,0.333291935226012,-0.293687524888766,-0.347859473554797,-0.089300971656411,0.142027393193559};
-	public double o27[]={111.17633500088529,92.07880492633424,	417.9818592609036,253.16188128024302,363.5279986597767,314.334093889305,187.32739056163342,240.4363027535162,422.60090880560665,327.63042902581515,62.04762897064405,	25.435663968682125,360.56773191905114,154.9226721156832,33.161292034425806,177.8091733067186,262.58198940407755,436.9800562237075,476.6400624069227,331.2167787340325,75.205948242522,484.33624811710115,258.4696246506982,419.8919566566751,357.51468895930395,166.3771729386268,47.59455935830133,188.20606700809785,184.7964918401363,267.9201349178807};
-	//public double o25[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	/**
 	 * the values in the constructive function is same for all the benchmark
 	 * instances
+	 * @throws IOException 
 	 */
-	public SRES() {
+	public SRES() throws IOException {
 		
 		//gamma = 0.83 alpha = 0.4 lambda = 280 mu = 40 varphi = 2 
 		lambda = 280;//280;
@@ -113,7 +122,6 @@ public class SRES {
 		alpha = 0.2;
 		trytimes = 10;
 		runtimes = 25;
-		pf = 0.45;
 		MaxGen = 500000/lambda+1;
 		//MaxGen = 3000;
 		f = new double[lambda];
@@ -129,13 +137,25 @@ public class SRES {
 		numberOfViolation3 = new int[6];
 		numberOfViolation4 = new int[6];
 		numberOfViolation5 = new int[6];
-		probability = new double[40];
+		probability = new double[30];
 		common = 1;
-		for (int i = 0; i < 40; i++) {
+		for (int i = 0; i < 30; i++) {
 			probability[i] = common;
 		}
 		accurate = 0.0001;
 		oldOptimum = Double.MAX_VALUE; 
+		
+		book = Workbook.createWorkbook(new File("data\\result.xls")); 
+		sheet1 = book.createSheet("第一页",0);
+		sheet2 = book.createSheet("第二页",0);
+		sheet3 = book.createSheet("第三页",0);
+		sheet1Row = 0;
+		sheet1Column = 0;
+		sheet2Row = 0;
+		sheet2Column = 0;
+		sheet3Row = 0;
+		sheet3Column = 0;
+		dformat =  new DecimalFormat("0.0000E00");
 	}
 	/**
 	 * Title: setParameters
@@ -156,7 +176,6 @@ public class SRES {
 				* (Math.log(1 / alpha * (Math.exp(varphi * varphi * chi / 2))
 						- (1 - alpha))));
 	//	System.out.println(varphi);
-    	//varphi = 2; 
 		varphi = 1.8;
 
 		tau = varphi / Math.sqrt(2 * Math.sqrt(variables));
@@ -169,11 +188,7 @@ public class SRES {
 		eta_u = new double[variables];
 		bestIndividual = new double[variables];
 		bestEta = new double[variables];
-//		weights = new double[constrained];
-//		for(int i = 0; i < constrained; i++){
-//			weights[i] = 1;
-//		}
-//		numberOfConstrained = new int[constrained];
+
 		phi = new double[lambda][constrained];
 		power3Individual = new double[runtimes][this.variables];
 		power4Individual = new double[runtimes][this.variables];
@@ -181,12 +196,6 @@ public class SRES {
 		x_ = new double[lambda][variables];
 		feasibleRun = runtimes;
 		optimaFlag = false;
-		
-//		newX = new double[lambda][variables];
-//		newF = new double[lambda];
-//		newPhi = new double[lambda][constrained];
-//		newPhiAll = new double[lambda];
-//		newEta = new double[lambda][variables];
 	}
 	// the array contains lower bound values and upper bound values
 	public void setlu(double array[][]) {
@@ -501,7 +510,7 @@ public class SRES {
 			for (int k = 1; k < 10; k++) {
 				for (int l = 1; l < 10; l++) {
 					sum = Math.pow(array[0] - j, 2) + Math.pow(array[1] - k, 2)
-							+ Math.pow(array[2] - l, 2)-0.0625;
+							+ Math.pow(array[2] - l, 2);
 					if (sum < sum1) {
 						sum1 = sum;
 					}
@@ -960,133 +969,6 @@ public class SRES {
 		return values;
 	}
 	
-	public double objective25(double array[], double o[]) {
-		double sum1 = 0;
-		double sum2 = 1;
-		double sum3 = 0;
-		for (int j = 0; j < this.variables; j++) {
-			sum1 += Math.pow(Math.cos((array[j] - o[j])), 4);
-			sum2 *= Math.pow(Math.cos(array[j] - o[j]), 2);
-			sum3 += (j + 1) * (array[j] - o[j]) * (array[j] - o[j]);
-		}
-		sum2 *= -2;
-		sum3 = Math.sqrt(sum3);
-		return -Math.abs((sum1 + sum2) / sum3);
-	}
-	
-	public double[] computeConstrain25(double array[],double o[]){
-		double values[] = new double[constrained];
-		double sum1 = 1;
-		double sum2 = 0;
-		for (int j = 0; j < variables; j++) {
-			sum1 *= (array[j] - o[j]);
-			sum2 += (array[j] - o[j]);
-		}
-		values[0] = 0.75 - sum1;
-		values[1] = sum2 - 7.5 * variables;
-		return values;
-	}
-	
-	public double objective26(double array[],double o[]){
-		double max = array[0]-o[0];
-		for(int j = 1; j < variables; j++){
-			if((array[j]-o[j]) > max){
-				max = array[j]-o[j];
-			}
-		}
-		return max;
-	}
-	public double[]computeConstrain26(double array[],double o[]){
-		double values[] = new double[constrained];
-		double sum1 = 0;
-		double sum2 = 0;
-		for(int j = 0; j < variables; j++){
-			sum1+=((array[j]-o[j])*(array[j]-o[j])-10*Math.cos(2*Math.PI*(array[j]-o[j]))+10);
-			sum2+=((array[j]-o[j]-0.5)*(array[j]-o[j]-0.5)-10*Math.cos(2*Math.PI*(array[j]-o[j]-0.5))+10);
-		}
-		values[0] = 10-sum1/(double)variables;
-		values[1] = sum1/(double)variables-15;
-		values[2] = Math.abs(sum2/(double)variables-20)-accurate;
-		return values;
-	}
-	
-	public double objective27(double array[],double o[]){
-		double sum = 0;
-		double array1 [] = new double[array.length];
-		for(int i = 0; i < variables; i++){
-			array1[i] = array[i]-o[i];
-		}
-		
-		for(int j = 0; j < variables-1; j++){
-			sum+=100*Math.pow(array1[j]*array1[j]-array1[j+1],2)+Math.pow(array1[j]-1, 2);
-		}
-		return sum;
-	}
-	public double[]computeConstrain27(double array[],double o[]){
-		double values[] = new double[constrained];
-		double array1 [] = new double[array.length];
-		for(int i = 0; i < variables; i++){
-			array1[i] = array[i]-o[i];
-		}
-		double sum = 0;
-		for(int j = 0; j < variables-1; j++){
-			sum+=Math.pow(array1[j]-array1[j+1], 2);
-		}
-		values[0] = Math.abs(sum)-accurate;
-		return values;
-	}
-	
-	public double objective28(double array[]){
-		return 100*Math.pow((array[1]-array[0]*array[0]),2)+Math.pow(array[0]-1, 2);
-	}
-	
-	public double[] computeConstrain28(double array[]){
-		double values[] = new double[constrained];
-		values[0] = Math.pow(array[0]-1, 3)-array[1]+1;
-		values[1] = array[0]+array[1]-2;
-		return values;
-	}
-	
-	public double objective29(double array[]){
-		double sum = 0;
-		sum+=Math.pow(array[0]-2, 2);
-		sum+=Math.pow(array[1]-2, 2);
-		sum+=Math.pow(array[2]-3, 2);
-		sum+=Math.pow(array[3]-1, 2);
-		sum+=Math.pow(array[4]-2, 2);
-		sum+=Math.pow(array[5]-1, 2);
-		sum-=Math.log(array[6]+1);
-		return sum;
-	}
-	
-	public double[] computeConstrain29(double array[]){
-		double values[] = new double[constrained];
-		values[0] = array[0]+array[1]+array[2]+array[3]+array[4]+array[5]-5;
-		values[1] = Math.pow(array[0], 2)+Math.pow(array[1], 2)+Math.pow(array[2], 2)+Math.pow(array[5], 2)-5.5;
-		values[2] = array[3]+array[0]-1.2;
-		values[3] = array[4]+array[1]-1.8;
-		values[4] = array[5]+array[2]-2.5;
-		values[5] = array[6]+array[0]-1.2;
-		values[6] = Math.pow(array[4], 2)+Math.pow(array[1], 2)-1.64;
-		values[7] = Math.pow(array[5], 2)+Math.pow(array[2], 2)-4.25;
-		values[8] = Math.pow(array[4], 2)+Math.pow(array[2], 2)-4.64;
-		return values;
-	}
-	
-	public double objective30(double array[]){
-		return 5.3578547*Math.pow(array[2], 2)+0.8356891*array[0]*array[4]+
-		37.293239*array[0]-40792.141;
-	}
-	public double[] computeConstrain30(double array[]){
-		double values[] = new double[constrained];
-		values[0] = 85.334407+0.0056858*array[1]*array[4]+0.00026*array[0]*array[3]-0.0022053*array[2]*array[4]-92;
-		values[1] = -(85.334407+0.0056858*array[1]*array[4]+0.00026*array[0]*array[3]-0.0022053*array[2]*array[4]);
-		values[2] = 80.51249+0.0071317*array[1]*array[4]+0.00026*array[0]*array[1]+0.0021813*array[2]*array[2]-110; 
-		values[3] = -(80.51249+0.0071317*array[1]*array[4]+0.00026*array[0]*array[1]+0.0021813*array[2]*array[2])+90;
-		values[4] = 9.300961+0.0047026*array[2]*array[4]+0.0012547*array[0]*array[2]+0.0019085*array[2]*array[3]-25;
-		values[5] = 20-(9.300961+0.0047026*array[2]*array[4]+0.0012547*array[0]*array[2]+0.0019085*array[2]*array[3]);
-		return values;
-	}
 	public double[] findMin(){
 		double array[] = new double[2];
 		double minimumValue = Double.MAX_VALUE;
@@ -1357,66 +1239,6 @@ public class SRES {
 			}
 			break;
 		}
-		case 25: {
-			for (int j = 0; j < fArray.length; j++) {
-				fArray[j] = objective25(xArray[j],o25);
-				phi1 = computeConstrain25(xArray[j],o25);
-				for (int m = 0; m < constrained; m++) {
-					phiArray[j][m] = phi1[m];
-				}
-			}
-			break;
-		}
-		case 26: {
-			for (int j = 0; j < fArray.length; j++) {
-				fArray[j] = objective26(xArray[j],o26);
-				phi1 = computeConstrain26(xArray[j],o26);
-				for (int m = 0; m < constrained; m++) {
-					phiArray[j][m] = phi1[m];
-				}
-			}
-			break;
-		}
-		case 27: {
-			for (int j = 0; j < fArray.length; j++) {
-				fArray[j] = objective27(xArray[j],o27);
-				phi1 = computeConstrain27(xArray[j],o27);
-				for (int m = 0; m < constrained; m++) {
-					phiArray[j][m] = phi1[m];
-				}
-			}
-			break;
-		}
-		case 28: {
-			for (int j = 0; j < fArray.length; j++) {
-				fArray[j] = objective28(xArray[j]);
-				phi1 = computeConstrain28(xArray[j]);
-				for (int m = 0; m < constrained; m++) {
-					phiArray[j][m] = phi1[m];
-				}
-			}
-			break;
-		}
-		case 29: {
-			for (int j = 0; j < fArray.length; j++) {
-				fArray[j] = objective29(xArray[j]);
-				phi1 = computeConstrain29(xArray[j]);
-				for (int m = 0; m < constrained; m++) {
-					phiArray[j][m] = phi1[m];
-				}
-			}
-			break;
-		}
-		case 30: {
-			for (int j = 0; j < fArray.length; j++) {
-				fArray[j] = objective30(xArray[j]);
-				phi1 = computeConstrain30(xArray[j]);
-				for (int m = 0; m < constrained; m++) {
-					phiArray[j][m] = phi1[m];
-				}
-			}
-			break;
-		}
 		}
 	}
 	
@@ -1595,7 +1417,6 @@ public class SRES {
 			sum = 0;
 			for (int j = 0; j < constrained; j++) {
 				if (phi[i][j] > 0) {
-				//	numberOfConstrained[j]++;
 					sum += Math.pow(phi[i][j],4);// * phi[i][j];
 				//	System.out.print("phi "+phi[i][j]+" ");
 				}
@@ -1605,7 +1426,6 @@ public class SRES {
 			quadratic_loss[i] = sum;
 		}
 	}
-	
 	public int minConstraints(){
 		double min = Double.MAX_VALUE;
 		int index = 0;
@@ -1623,17 +1443,14 @@ public class SRES {
 		}
 		return index;
 	}
+	
 	// return the best objective value found
 	public double es(int indexf, int runNumber, double optimal)
 			throws IOException {
 
 		init_x();
 		init_eta();
-	
-//		int constraints[] = new int[constrained];
-//		for(int j = 0; j < constrained; j++){
-//			weights[j] = 1;
-//		}
+
 		bestMin = Double.MAX_VALUE;
 		currentMin  = Double.MAX_VALUE;
 		SuccessGm = Integer.MAX_VALUE;
@@ -1665,6 +1482,7 @@ public class SRES {
 					SuccessGm = i;
 					flag = true;
 				}
+			
 				// to store the best individual values
 				for (int j = 0; j < variables; j++) {
 					bestIndividual[j] = x[minIndex][j];
@@ -1672,36 +1490,28 @@ public class SRES {
 					bestflag = true;
 				}
 			}
-
-//			if(bestMin != Double.MAX_VALUE){
-//				if(bestMin > optimal){
-//					System.out.println(bestMin+" "+i);
-//				}
-//			}else{
-//				int index = minConstraints();
-//				if(f[index] > optimal){
-//					System.out.println(f[index]+" "+i);
-//				}
+//			if((runNumber == (runtimes/2))&& (bestMin > optimal)&&(bestMin!=Double.MAX_VALUE)){
+//			//if((bestMin > optimal)&&(bestMin!=Double.MAX_VALUE)){
+//			//	System.out.println(bestMin+" "+i);
+//				bw.write(bestMin+" "+i);
+//				bw.write("\n");
 //			}
-//		if(i != 0){
-//			for(int j = 0; j < constrained; j++){
-//				constraints[j] = numberOfConstrained[j];
-//				numberOfConstrained[j] = 0;
-//			}
-//		}
+			if((runNumber == (runtimes/2))&&(bestMin != Double.MAX_VALUE)){
+				if(bestMin > optimal){
+					bw.write(bestMin+" "+i);
+                   	bw.write("\n");
+				}
+			}else if ((runNumber == (runtimes/2))&&(bestMin == Double.MAX_VALUE)){
+				int index = minConstraints();
+				if(f[index] > optimal){
+					bw.write(f[index]+" "+i);
+                   	bw.write("\n");
+				}
+			}
 			computeQuadratic_loss_Normalize();
 			computeQuadratic_loss();
 	//		overall_Normal();
-			sort(indexf, i);
-			//sort1();
-		//	sorting(indexf,i);
-		//	sortTem(indexf, i);
-//			if(i != 0){
-//			for(int j = 0; j < constrained; j++){
-//				weights[j] = weights[j]*(numberOfConstrained[j]+1)/((double)constraints[j]+1);
-//				}
-//			}
-//			}
+			sort(indexf,i,optimal,runNumber);
 			
 			for (int j = 0; j < mu; j++) {
 				for (int m = 0; m < variables; m++) {
@@ -1736,8 +1546,6 @@ public class SRES {
 			} else {
 				this.newES1(0, lambda,i);
 			}
-//			newESnew(0, lambda, i);
-//			selection();
 			feasible.clear();
 		}
 
@@ -1745,48 +1553,22 @@ public class SRES {
 			feasibleRun--;
 			System.out.println("warning: solution is infeasible");
 		}
+
 		System.out.println(bestMin + "  " + SuccessGm);
-//		if (SuccessGm < Integer.MAX_VALUE) {
-//			for (int i = 0; i < variables; i++) {
-//				System.out.print(bestIndividual[i] + " ");
-//			}
-//			System.out.println();
-//		}
 		return bestMin;
 	}
 	
 	public void newES(int start, int end,int gen) {
-		update_eta(3*mu+mu/2,end);
-		mutation(0,3*mu+mu/2,3*mu+mu/2,end);
-		exponentialSmoothing(3*mu+mu/2,end,gen);
-	}
-	
-//	public void newESnew(int start, int end, int gen){
-//		update_etaNew(3*mu+mu/2, end);
-//		mutationNew(0,3*mu+mu/2,3*mu+mu/2,end);	
-//		exponentialSmoothingNew(3*mu+mu/2, end,gen);
-//	}
-	
-	public void newES1(int start, int end,int gen) {
-//		update_eta( 3*mu, 6*mu);
-//		mutation(0, 3*mu,3*mu,6*mu);
-//		exponentialSmoothing(3*mu, 6*mu,gen);
 		update_eta( 3*mu+mu/2, end);
 		mutation(0,3*mu+mu/2,3*mu+mu/2,end);
 		exponentialSmoothing(3*mu+mu/2, end,gen);
 	}
 	
-//	public void newES(int start, int end,int gen) {
-//		update_eta( 2*mu, end);
-//		mutation(0,2*mu,2*mu,end);
-//		exponentialSmoothing(2*mu, end,gen);
-//	}
-//	
-//	public void newES1(int start, int end,int gen) {
-//		update_eta( mu, end);
-//		mutation(0,mu,mu,end);
-//		exponentialSmoothing(mu, end,gen);
-//	}
+	public void newES1(int start, int end,int gen) {
+		update_eta( 3*mu+mu/2, end);
+		mutation(0, 3*mu+mu/2,3*mu+mu/2,end);
+		exponentialSmoothing(3*mu+mu/2, end,gen);
+	}
 	
 	public void update_eta(int start, int end) {
 		// to store the origional eta in oldEta
@@ -1820,37 +1602,6 @@ public class SRES {
 		}
 	}
 	
-//	public void update_etaNew(int start, int end) {
-//		// to store the origin eta in oldEta
-//		for (int i = 0; i < lambda; i++) {
-//			for (int j = 0; j < variables; j++) {
-//				oldEta[i][j] = eta[i][j];
-//			}
-//		}
-//		// update eta as Improved SR
-//		double power = 0;
-//		double power1 = 0;
-//		double tem1 = 0;
-//		for (int i = start; i < end; i++) {
-//			power = tau_ * rand.nextGaussian();
-//			for (int j = 0; j < variables; j++) {
-//				power1 = power;
-//				tem1 =  rand.nextGaussian();
-//				power1 += tau * tem1;
-//				newEta[i][j] = eta[i][j] * Math.exp(power1);
-//		//		System.out.print(power1+"  ");
-//			}
-//			//System.out.println();
-//		}
-//		// check if eta beyond upper bound
-//		for (int i = start; i < end; i++) {
-//			for (int j = 0; j < variables; j++) {
-//				if (newEta[i][j] > eta_u[j]) {
-//					newEta[i][j] = eta_u[j];
-//				}
-//			}
-//		}
-//	}
 	public void mutation(int start1,int end1,int start2, int end2) {
 //		for(int i = start1; i < end1; i++){
 //			for(int j = 0; j < variables; j++){
@@ -1922,53 +1673,6 @@ public class SRES {
 			}
 		}
 	}
-	
-//	public void mutationNew(int start1,int end1,int start2, int end2) {
-//		int tries = 0;
-//	    tries = 1;
-//		for (int i = start1; i < end1; i++) {
-//			tries = 1;
-////			int tem = Math.abs(rand.nextInt() % mu)+2*mu;
-////			int rankes = Math.abs(rand.nextInt()%4)+2*mu;
-//			int tem = Math.abs(rand.nextInt() % mu);//+1*mu;
-//			int tem1 = Math.abs(rand.nextInt() % mu);//+1*mu;
-//			int rankes = Math.abs(rand.nextInt()%10);//+1*mu;
-//		//	gamma = 0.7+3*rand.nextDouble()/(double)10;
-//
-//			for (int j = 0; j < variables; j++) {
-//		//		x_[i][j] = x[i][j];
-//		//		System.out.println(x_[rankes][j]);
-//				newX[i][j] = x_[rankes][j] + gamma * (x_[i][j] - x_[tem][j]);
-//			//	x[i][j] = x_[i][j] + gamma * (x_[rankes][j] - x_[tem][j]);
-//		//		x[i][j] = gamma*x[i][j];
-//		//		x[i][j] = x[rankes][j] + gamma * (x[i][j] - x[tem][j]);
-//				while (((newX[i][j] > lu[1][j]) || (newX[i][j] < lu[0][j]))
-//						&& (tries < (trytimes + 1))) {
-//					newX[i][j] = x_[i][j] + eta[i][j] * rand.nextGaussian();
-//					tries++;
-//				}
-//				if (tries == (trytimes + 1)) {
-//					newX[i][j] = x_[i][j];
-//				}
-//			}
-//		}
-//		// the mutation of lambda-mu+1 individuals are the same as SR
-//		for (int i = start2; i < end2; i++) {
-//			tries = 1;
-//			for (int j = 0; j < variables; j++) {
-//		//		x_[i][j] = x[i][j];
-//				newX[i][j] += eta[i][j] * rand.nextGaussian();
-//				while (((newX[i][j] > lu[1][j]) || (newX[i][j] < lu[0][j]))
-//						&& (tries < (trytimes + 1))) {
-//					newX[i][j] = x_[i][j] + eta[i][j] * rand.nextGaussian();
-//					tries++;
-//				}
-//				if (tries == (trytimes + 1)) {
-//					newX[i][j] = x_[i][j];
-//				}
-//			}
-//		}
-//	}
 	public boolean isContain(int index){
 		for(int i = 0; i < equalIndex.length; i++){
 			if(index == equalIndex[i]){
@@ -1992,10 +1696,17 @@ public class SRES {
 	public double findOptimum(int index,int gen) throws IOException {
 		if(this.isContain(index)){
 			probability[index] = 0.2*(1+5*Math.pow((gen/(double)MaxGen),0.5));
-		//	probability[index] = 0.2*(1+5*Math.pow((gen/(double)MaxGen),0.5));
 		//	probability[index] = 0.5*(1+Math.pow((gen/(double)MaxGen),4));
+			//probability[index] = gen/(double)100;
 		}
-
+//		if(gen < 100){
+//			probability[index] = 0.2;
+//		}else if(isContain(index)){
+//			probability[index] = 0.5*(1+Math.pow((gen/(double)MaxGen),0.5));
+//		}
+//		if(this.isContain(index)){
+//		probability[index] = Math.pow(2, -(1-gen/(double)MaxGen));
+//	}
 		double optim = Double.MAX_VALUE;
 		if (feasible.size() != 0) {
 			for (int m = 0; m < feasible.size(); m++) {
@@ -2037,30 +1748,38 @@ public class SRES {
 		//		int tem1 = Math.abs(rand.nextInt()%lambda);
 		//		return f[tem1];
 		//		System.out.println("qua2 "+qua2);
-		//  	optimaFlag = false;
+			//	optimaFlag = false;
 				return qua2;
 	    //		return (unoptim+qua2)/2;
 			}
 		}
 	}
 	
-	//it has problem
 	public boolean isDominance(int i, int j) {
 		if ((f[i] <= f[j] && quadratic_loss[i] <= quadratic_loss[i])
 				|| (f[i] >= f[j] && quadratic_loss[i] >= quadratic_loss[j])) {
-		//if(f[i] >= f[j]&&quadratic_loss[i] >= quadratic_loss[j]){
 			return true;
 		}
 		return false;
-	}
-	
-//	public boolean isDominanceNew(int index){
-//		if ((f[index] <= newF[index] && quadratic_loss[index] <= newPhiAll[index])
-//				|| (f[index] >= newF[index] && quadratic_loss[index] >= newPhiAll[index])) {
+//		if(f[i] <= f[j]){
+//			for(int m = 0; m < constrained; m++){
+//				if(phi[i][m] > phi[j][m] ){
+//					return false;
+//				}
+//			}
+//			return true;
+//		}
+//		if(f[i] >= f[j]){
+//			for(int m = 0; m < constrained; m++){
+//				if(phi[i][m] < phi[j][m] ){
+//					return false;
+//				}
+//			}
 //			return true;
 //		}
 //		return false;
-//	}
+	}
+	
 	public void exponentialSmoothing(int start, int end,int gen) {
 	//		if(gen < MaxGen/10){
 	//			alpha = 0.4;
@@ -2069,13 +1788,6 @@ public class SRES {
 	//		}else{
 	//			alpha = 0.2;
 	//		}
-//		alpha = 0.4;
-//		for (int i = start; i < end; i++) {
-//		//alpha = 0.25+rand.nextDouble()/(double)10;
-//		for (int j = 0; j < variables; j++) {
-//			eta[i][j] = oldEta[i][j] + alpha * (eta[i][j] - oldEta[i][j]);
-//		}
-//	}
 			alpha = 0.4;
 			for (int i = start; i < start+mu; i++) {
 				//alpha = 0.25+rand.nextDouble()/(double)10;
@@ -2097,22 +1809,13 @@ public class SRES {
 					eta[i][j] = oldEta[i][j] + alpha * (eta[i][j] - oldEta[i][j]);
 				}
 			}
-//			for (int i = start; i < end; i++) {
-//				//alpha = 0.25+rand.nextDouble()/(double)10;
-//				for (int j = 0; j < variables; j++) {
-//					eta[i][j] = oldEta[i][j] + alpha * (eta[i][j] - oldEta[i][j]);
-//				}
-//			}
+	//		for (int i = start; i < end; i++) {
+	//			//alpha = 0.25+rand.nextDouble()/(double)10;
+	//			for (int j = 0; j < variables; j++) {
+	//				eta[i][j] = oldEta[i][j] + alpha * (eta[i][j] - oldEta[i][j]);
+	//			}
+	//		}
 		}
-	
-//	public void exponentialSmoothingNew(int start, int end, int gen){
-//		for (int i = start; i < end; i++) {
-//			//alpha = 0.25+rand.nextDouble()/(double)10;
-//			for (int j = 0; j < variables; j++) {
-//				newEta[i][j] = oldEta[i][j] + alpha * (eta[i][j] - oldEta[i][j]);
-//			}
-//		}
-//	}
 	public int compare(int i,  double optim) {
 		boolean flag = isDominance(ranked[i], ranked[i + 1]);
 		if (flag == true) {
@@ -2229,62 +1932,6 @@ public class SRES {
 		}
 	}
 	
-	public int comparison(int i, int j){
-		if(f[i]<=f[j]&&quadratic_loss[i]<=quadratic_loss[j]){
-			return 1;
-		}else if(f[i]>=f[j]&&quadratic_loss[i]>=quadratic_loss[j]){
-			return -1;
-		}
-		double distance1 = 0;
-		double distance2 = 0;
-		distance1 = Math.abs(optimum-f[i]);
-		distance2 = Math.abs(optimum-f[j]);
-		if(distance1 <= distance2){
-			return 1;
-		}else{
-			return -1;
-		}
-	}
-	public void sorting(int index, int gen) throws IOException{
-		for (int i = 0; i < ranked.length; i++) {
-			ranked[i] = i;
-		}
-		
-		optimum = findOptimum(index, gen);
-		boolean flag = true;
-		int tem = 0; 
-		int indicator = 0;
-		for(int i = 0; i < lambda; i++){
-			flag = false;
-			for (int j = 0; j < lambda - 1 - i; j++){
-				indicator = this.comparison(ranked[j], ranked[j+1]);
-				if(indicator == -1){
-					tem = ranked[j];
-					ranked[j] = ranked[j+1];
-					ranked[j+1] = tem;
-					
-					flag = true;
-				}
-			}
-			if (flag == false) {
-				break;
-			}
-		}
-	}
-//	public int compare4(int i,  double optim) {
-//		boolean flag = isDominance(ranked[i], ranked[i + 1]);
-//		if (flag == true) {
-//			return 1;
-//		}
-//
-//		double d1 = Math.abs(f[ranked[i]]-optim);
-//		double d2 = Math.abs(optim - f[ranked[i + 1]]);
-//		if(d1 < d2){
-//			return -1;
-//		}else{
-//			return 1;
-//		}
-//	}
 	public int compare3(int i,  double optim) {
 		boolean flag = isDominance(ranked[i], ranked[i + 1]);
 		if (flag == true) {
@@ -2293,27 +1940,24 @@ public class SRES {
 
 		if (quadratic_loss[ranked[i]] == 0
 				&& quadratic_loss[ranked[i + 1]] != 0) {
+
 			double d1 = f[ranked[i]] - optim;
 			double d2 = Math.abs(optim - f[ranked[i + 1]]);
-			
-			//when d1>d2, then we want to select d2, and d2 is the infeasible one,
-			//if we want to choose it, only by comparing the objective value
-			//if d1 < d2, then we can choose it by comparing quadratic loss value because d1
-			//is a feasible solution
 			if (d1 > d2) {
 				return -1;
 			} else {
 				return 1;
 			}
+
 		} else if (quadratic_loss[ranked[i]] != 0
 				&& quadratic_loss[ranked[i + 1]] == 0) {
 
-			double d1 = Math.abs(f[ranked[i]] - optim);
-			double d2 = Math.abs(optim - f[ranked[i+1]]);
+			double d1 = f[ranked[i + 1]] - optim;
+			double d2 = Math.abs(optim - f[ranked[i]]);
 			if (d1 > d2) {
-				return 1;
-			} else {
 				return -1;
+			} else {
+				return 1;
 			}
 
 		} else {
@@ -2330,7 +1974,7 @@ public class SRES {
 						return 1;
 					}
 				} else {
-					if (f[ranked[i]] > f[ranked[i+1]]) {
+					if (f[ranked[i + 1]] < f[ranked[i]]) {
 						return -1;
 					} else {
 						return 1;
@@ -2339,175 +1983,8 @@ public class SRES {
 			}
 		}
 	}
-
-//	//-1 means using the objective as the comparion criteria
-//	//1 means using the quadratic value as the compariso criteria
-//	public int compare3(int i,  double optim) {
-//		boolean flag = isDominance(ranked[i], ranked[i + 1]);
-//		if (flag == true) {
-//			return 1;
-//		}
-//
-//		if (quadratic_loss[ranked[i]] == 0
-//				&& quadratic_loss[ranked[i + 1]] != 0) {
-//			double d1 = Math.abs(f[ranked[i]] - optim);
-//			double d2 = Math.abs(optim - f[ranked[i + 1]]);
-//			if (d1 > d2) {
-//				return -1;
-//			} else {
-//				return 1;
-//			}
-//
-//		} else if (quadratic_loss[ranked[i]] != 0
-//				&& quadratic_loss[ranked[i + 1]] == 0) {
-//			double d1 = Math.abs(f[ranked[i + 1]] - optim);
-//			double d2 = Math.abs(optim - f[ranked[i]]);
-//			if (d1 > d2) {
-//				return -1;
-//			} else {
-//				return 1;
-//			}
-//
-//		} else {
-//			if ((optim > f[ranked[i]] && f[ranked[i]] > f[ranked[i + 1]])
-//					|| (optim > f[ranked[i + 1]] && f[ranked[i + 1]] > f[ranked[i]])) {
-//				return 1;
-//			} else {
-//				double d1 = Math.abs(optim - f[ranked[i]]);
-//				double d2 = Math.abs(optim - f[ranked[i + 1]]);
-//				if (d1 < d2) {
-//					if (f[ranked[i]] < f[ranked[i + 1]]) {
-//						return -1;
-//					} else {
-//						return 1;
-//					}
-//				} else {
-//					if (f[ranked[i + 1]] < f[ranked[i]]) {
-//						return -1;
-//					} else {
-//						return 1;
-//					}
-//				}
-//			}
-//		}
-//	}
 	
-//	public int compare3New(int i,  double optim) {
-//		boolean flag = isDominanceNew(i);
-//		if (flag == true) {
-//			return 1;
-//		}
-//
-//		if (quadratic_loss[i] == 0 && newPhiAll[i] != 0) {
-//			double d1 = f[i] - optim;
-//			double d2 = Math.abs(optim - newF[i]);
-//			if (d1 > d2) {
-//				return -1;
-//			} else {
-//				return 1;
-//			}
-//		} else if (quadratic_loss[i] != 0 && newPhiAll[i] == 0) {
-//			double d1 = Math.abs(f[i]-optim);
-//			double d2 = optim - newF[i];
-//			if (d1 > d2) {
-//				return -1;
-//			} else {
-//				return 1;
-//			}
-//
-//		} else {
-//			if ((optim > f[i] && f[i] > newF[i])
-//					|| (optim > newF[i] && newF[i] > f[i])) {
-//				return 1;
-//			} else {
-//				double d1 = Math.abs(optim - f[i]);
-//				double d2 = Math.abs(optim - newF[i]);
-//				if (d1 < d2) {
-//					if (f[i] < newF[i]) {
-//						return -1;
-//					} else {
-//						return 1;
-//					}
-//				} else {
-//					if (newF[i] < f[i]) {
-//						return -1;
-//					} else {
-//						return 1;
-//					}
-//				}
-//			}
-//		}
-//	}
-	
-//	public void selection(){
-//		int indicator = 0;
-//		for(int i = 0; i < lambda; i++){
-//			indicator = compare3New(i, optimum);
-//			if(indicator == -1){
-//				if(f[i] > newF[i]){
-//					//choosing the new individual 
-//					//and update the x, f, phi, quadratic_loss, eta
-//					for(int j = 0; j < variables; j++){
-//						x[i][j] = newX[i][j];
-//						eta[i][j] = newEta[i][j];
-//					}
-//					for(int j = 0; j < constrained; j++){
-//						phi[i][j] = newPhi[i][j];
-//					}
-//					f[i] = newF[i];
-//					quadratic_loss[i] = newPhiAll[i];
-//				}
-//			}else{
-//				if(quadratic_loss[i] > newPhiAll[i]){
-//					//choosing the new individual 
-//					//and update the x, f, phi, quadratic_loss, eta
-//					for(int j = 0; j < variables; j++){
-//						x[i][j] = newX[i][j];
-//						eta[i][j] = newEta[i][j];
-//					}
-//					for(int j = 0; j < constrained; j++){
-//						phi[i][j] = newPhi[i][j];
-//					}
-//					f[i] = newF[i];
-//					quadratic_loss[i] = newPhiAll[i];
-//				}
-//			}
-//		}
-//	}
-	
-	public void sortTem(int index, int gen) throws IOException{
-		for (int i = 0; i < ranked.length; i++) {
-			ranked[i] = i;
-		}
-		boolean flag = true;
-		int tem = 0; 
-		optimum = findOptimum(index, gen);
-		
-		for (int i = 0; i < lambda; i++) {
-			flag = false;
-			for (int j = 0; j < lambda - 1 - i; j++) {
-				if (quadratic_loss[ranked[j]] > quadratic_loss[ranked[j + 1]]) {
-					tem = ranked[j];
-					ranked[j] = ranked[j + 1];
-					ranked[j + 1] = tem;
-
-					flag = true;
-				} else if (quadratic_loss[ranked[j]] == quadratic_loss[ranked[j + 1]]) {
-					if (f[ranked[j]] > f[ranked[j + 1]]) {
-						tem = ranked[j];
-						ranked[j] = ranked[j + 1];
-						ranked[j + 1] = tem;
-						flag = true;
-					}
-				}
-			}
-
-			if (flag == false) {
-				break;
-			}
-		}
-	}
-	public void sort(int index,int gen) throws IOException {
+	public void sort(int index,int gen,double optima,int runNumber) throws IOException {
 		for (int i = 0; i < ranked.length; i++) {
 			ranked[i] = i;
 		}
@@ -2523,9 +2000,10 @@ public class SRES {
 	//	double optimumOld = optimum;
 	//	boolean optiFlag = optimaFlag;
 	    optimum = findOptimum(index, gen);
-//	    if(optimum > -1){
-//	    System.out.println(optimum+" "+gen);
-//	    }
+//		if((runNumber == (runtimes/2))&& (optimum > optima)){
+//			bw.write(optimum+" "+gen);
+//			bw.write("\n");
+//		}
 //	    for(int i = 0; i < lambda; i++){
 //	    	System.out.println("distance "+(f[i]-optimum));
 //	    }
@@ -2539,7 +2017,6 @@ public class SRES {
 			flag = false;
 			for (int j = 0; j < lambda - 1 - i; j++) {
 				int value = compare3(j, optimum);
-				//int value = 1;
 				if (value == -1) {
 					if (f[ranked[j]] > f[ranked[j + 1]]) {
 						tem = ranked[j];
@@ -2579,58 +2056,78 @@ public class SRES {
 			}
 		}
 	}
-	// stochastic sort
-	public void sort1() {
-		for (int i = 0; i < ranked.length; i++) {
-			ranked[i] = i;
-		}
-		double truepf = 0;
-		boolean flag = true;
-		int tem = 0;
-		// pf = pf+0.0002;
-		// the values in the ranked indicates the relationship
-		for (int i = 0; i < lambda; i++) {
-			flag = false;
-			for (int j = 0; j < lambda - 1 - i; j++) {
-				truepf = rand.nextDouble();
-				if ((quadratic_loss[ranked[j]] == 0 && quadratic_loss[ranked[j + 1]] == 0)
-						|| truepf < pf) {
-					if (f[ranked[j]] > f[ranked[j + 1]]) {
-						tem = ranked[j];
-						ranked[j] = ranked[j + 1];
-						ranked[j + 1] = tem;
-
-						flag = true;
-					}
-				} else {
-					if (quadratic_loss[ranked[j]] > quadratic_loss[ranked[j + 1]]) {
-						tem = ranked[j];
-						ranked[j] = ranked[j + 1];
-						ranked[j + 1] = tem;
-
-						flag = true;
-					}
-				}
-			}
-			if (flag == false) {
-				break;
-			}
-		}
-	}
-	public void executeInstance(int indexf,double optima) throws IOException{
+	
+	public void executeInstance(int indexf,double optima) throws IOException, RowsExceededException, WriteException{
 		double bestValues[] = new double[runtimes];
 		double bestGener[] = new double[runtimes];
 		double successGener[] = new double[runtimes];
+		fw = new FileWriter(new File("data\\optimum"+indexf+".txt"),true);
+		bw = new BufferedWriter(fw); 
 		for (int i = 0; i < runtimes; i++) {
 			rand = new Random(System.currentTimeMillis());
 			bestValues[i] = es(indexf, i, optima);
 			bestGener[i] = Gm;
 			successGener[i] = SuccessGm;
 		}
+		bw.flush();
+		fw.flush();
+		bw.close();
+		fw.close();
 		print(indexf, optima);
+		if((indexf%6)==1){
+			printString();
+			sheet1Column++;
+			sheet1Row = 0;
+		}
+		printExcel(indexf, optima);
+		sheet1Column++;
+		sheet1Row = 0;
+		if((indexf%6) == 0){
+			for(int i = 0; i < 21; i++){
+			String line = "\\\\" +" \\cline{2-8}";
+			sheet1.addCell(new Label(sheet1Column,sheet1Row, line));
+			sheet1Row++;
+			}
+		}
+		sheet1Column++;
+		sheet1Row = 0;
+		double bestValuesCopy[] = new double[runtimes];
+		for(int i = 0; i < runtimes; i++){
+			bestValuesCopy[i] = bestValues[i];
+		}
 		printGeneral(bestValues, bestGener, successGener, optima);
+		printGeneralExcel(bestValuesCopy, bestGener, successGener, optima);
+		sheet2Row++;
+		sheet2Column = 0;
+		sheet3Row++;
+		sheet3Column = 0;
 	}
 	
+	public void printString() throws RowsExceededException, WriteException{
+		for(int i = 0; i < 3; i++){
+		String best = "& Best ";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, best));
+		sheet1Row++;
+		String median = "& Median ";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, median));
+		sheet1Row++;
+		String worst = "& Worst ";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, worst));
+		sheet1Row++;
+		String c = "& c ";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, c));
+		sheet1Row++;
+		String v = "& v ";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, v));
+		sheet1Row++;
+		String mean = "& Mean ";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, mean));
+		sheet1Row++;
+		String std = "& Std ";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, std));
+		sheet1Row++;
+		}
+	}
 	public double[] constrainForSingle(int index,double individual[]){
 		double temPhi[] = new double[constrained];
 		switch(index){
@@ -2735,30 +2232,6 @@ public class SRES {
 		}
 		case 24:{
 			temPhi = computeConstrain24(individual);
-			break;
-		}
-		case 25:{
-			temPhi = computeConstrain25(individual,o25);
-			break;
-		}
-		case 26:{
-			temPhi = computeConstrain26(individual,o26);
-			break;
-		}
-		case 27:{
-			temPhi = computeConstrain27(individual,o27);
-			break;
-		}
-		case 28:{
-			temPhi = computeConstrain28(individual);
-			break;
-		}
-		case 29:{
-			temPhi = computeConstrain29(individual);
-			break;
-		}
-		case 30:{
-			temPhi = computeConstrain30(individual);
 			break;
 		}
 		}
@@ -2893,25 +2366,47 @@ public class SRES {
 		powerViolations[5] = n3;
 		return v;
 	}
-	public void print(int index,double optimal){
+	public void print(int index,double optimal) throws RowsExceededException, WriteException, IOException{
 		double v = 0;
 		double viola[] = constructViolations(index, power3Individual);
 		sortOfResult(viola, power3,power3Individual);
 		v  = statistical(index, power3Individual,numberOfViolation3);
 		print3(v, optimal);
-		
+		//print3Excel(v, optimal);
+
 		viola = constructViolations(index, power4Individual);
 		sortOfResult(viola, power4,power4Individual);
 		v  = statistical(index, power4Individual,numberOfViolation4);
 		print4(v, optimal);
+	//	print4Excel(v, optimal);
 		
 		viola = constructViolations(index, power5Individual);
 		sortOfResult(viola, power5,power5Individual);
 		v  = statistical(index, power5Individual,numberOfViolation5);
 		print5(v, optimal);
-		
+	//	print5Excel(v, optimal);
 	}
 	
+	public void printExcel(int index,double optimal) throws RowsExceededException, WriteException, IOException{
+		double v = 0;
+		double viola[] = constructViolations(index, power3Individual);
+		sortOfResult(viola, power3,power3Individual);
+		v  = statistical(index, power3Individual,numberOfViolation3);
+		//print3(v, optimal);
+		print3Excel(v, optimal);
+
+		viola = constructViolations(index, power4Individual);
+		sortOfResult(viola, power4,power4Individual);
+		v  = statistical(index, power4Individual,numberOfViolation4);
+	//	print4(v, optimal);
+		print4Excel(v, optimal);
+		
+		viola = constructViolations(index, power5Individual);
+		sortOfResult(viola, power5,power5Individual);
+		v  = statistical(index, power5Individual,numberOfViolation5);
+//		print5(v, optimal);
+		print5Excel(v, optimal);
+	}
 //	public double findMin(double array[]) {
 //		double min = Double.MAX_VALUE;
 //		for (int i = 0; i < array.length; i++) {
@@ -2984,6 +2479,31 @@ public class SRES {
 				+ findStd(power3, findMean(power3)));
 	}
 
+	public void print3Excel(double v, double known) throws RowsExceededException, WriteException, IOException{
+		//	System.out.println("5*10^3");
+		String best = dformat.format(power3[0] - known).toString() +"("+Integer.toString(numberOfViolation3[0])+")";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, best));
+		sheet1Row++;
+		String median = dformat.format(power3[runtimes / 2] - known).toString()+"("+Integer.toString(numberOfViolation3[1])+")";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, median));
+		sheet1Row++;
+		String worst = dformat.format(power3[runtimes - 1] - known).toString()+"("+Integer.toString(numberOfViolation3[2])+")";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, worst));
+		sheet1Row++;
+		String c = Integer.toString(numberOfViolation3[3])+","+Integer.toString(numberOfViolation3[4])+","+
+		Integer.toString(numberOfViolation3[5]);
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, c));
+		sheet1Row++;
+		String v1 = dformat.format(v).toString();
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, v1));
+		sheet1Row++;
+		String mean = dformat.format(findMean(power3) - known).toString();
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, mean));
+		sheet1Row++;
+		String std = dformat.format(findStd(power3, findMean(power3))).toString();
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, std));
+		sheet1Row++;
+		}
 	public void print4(double v, double known){
 		  System.out.println("5*10^4");
 		  System.out.println("Best "+(power4[0]-known)+"("+numberOfViolation4[0]+")");
@@ -2993,6 +2513,30 @@ public class SRES {
 		  System.out.println("v "+v);
 		  System.out.println("Mean "+(findMean(power4)-known));
 		  System.out.println("Std "+findStd(power4, findMean(power4)));
+	}
+	public void print4Excel(double v, double known) throws RowsExceededException, WriteException, IOException{
+		String best = dformat.format(power4[0] - known).toString()+"("+Integer.toString(numberOfViolation4[0])+")";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, best));
+		sheet1Row++;
+		String median = dformat.format(power4[runtimes / 2] - known).toString()+"("+Integer.toString(numberOfViolation4[1])+")";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, median));
+		sheet1Row++;
+		String worst = dformat.format(power4[runtimes - 1] - known).toString()+"("+Integer.toString(numberOfViolation4[2])+")";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, worst));
+		sheet1Row++;
+		String c = Integer.toString(numberOfViolation4[3])+","+Integer.toString(numberOfViolation4[4])+","+
+		Integer.toString(numberOfViolation4[5]);
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, c));
+		sheet1Row++;
+		String v1 = dformat.format(v).toString();
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, v1));
+		sheet1Row++;
+		String mean = dformat.format(findMean(power4) - known).toString();
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, mean));
+		sheet1Row++;
+		String std = dformat.format(findStd(power4, findMean(power4))).toString();
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, std));
+		sheet1Row++;
 	}
 	
 	public void print5(double v,double known){
@@ -3005,7 +2549,30 @@ public class SRES {
 		  System.out.println("Mean "+(findMean(power5)-known));
 		  System.out.println("Std "+findStd(power5, findMean(power5)));
 	}
-	
+	public void print5Excel(double v,double known) throws RowsExceededException, WriteException, IOException{
+		String best = dformat.format(power5[0] - known).toString()+"("+Integer.toString(numberOfViolation5[0])+")";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, best));
+		sheet1Row++;
+		String median = dformat.format(power5[runtimes / 2] - known).toString()+"("+Integer.toString(numberOfViolation5[1])+")";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, median));
+		sheet1Row++;
+		String worst = dformat.format(power5[runtimes - 1] - known).toString()+"("+Integer.toString(numberOfViolation5[2])+")";
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, worst));
+		sheet1Row++;
+		String c = Integer.toString(numberOfViolation5[3])+","+Integer.toString(numberOfViolation5[4])+","+
+		Integer.toString(numberOfViolation5[5]);
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, c));
+		sheet1Row++;
+		String v1 = dformat.format(v).toString();
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, v1));
+		sheet1Row++;
+		String mean = dformat.format(findMean(power5) - known).toString();
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, mean));
+		sheet1Row++;
+		String std = dformat.format(findStd(power5, findMean(power5))).toString();
+		sheet1.addCell(new Label(sheet1Column,sheet1Row, std));
+		sheet1Row++;
+	}
 	public void printGeneral(double bestValues[],double bestGener[],double successGener[],double known){
 		 double success = 0;
 		 double generation = 0;
@@ -3056,9 +2623,82 @@ public class SRES {
 //		 System.out.println("optimal G " + findMedian(bestGener) + " ");
 	}
 	
-	public static void main(String[] args) throws IOException {
+	public void printGeneralExcel(double bestValues[],double bestGener[],double successGener[],double known) throws RowsExceededException, WriteException, IOException{
+		 double success = 0;
+		 double generation = 0;
+		 double mean = 0;
+		
+		 ArrayList<Integer> list = new ArrayList<Integer>();
+		 for(int i = 0; i < runtimes; i++){
+			 if((bestValues[i]-known) < 0.0001){
+				 success++;
+				 generation+=successGener[i];
+				 list.add((int)successGener[i]);
+			 }
+		 }
+		 if (list.size() != 0) {
+			double actualSuccess[] = new double[list.size()];
+			for (int i = 0; i < actualSuccess.length; i++) {
+				actualSuccess[i] = list.get(i) * lambda;
+			}
+			bubbleSort(actualSuccess);
+			mean = findMean(actualSuccess);
+			String best = Integer.toString((int)actualSuccess[0]);
+			sheet2.addCell(new Label(sheet2Column,sheet2Row, best));
+			sheet2Column++;
+			String median = Integer.toString((int)actualSuccess[(int) success / 2]);
+			sheet2.addCell(new Label(sheet2Column,sheet2Row, median));
+			sheet2Column++;
+			String worst = Integer.toString((int)actualSuccess[(int) success - 1]);
+			sheet2.addCell(new Label(sheet2Column,sheet2Row, worst));
+			sheet2Column++;
+		    String mean1 = Integer.toString((int)mean);
+		    sheet2.addCell(new Label(sheet2Column,sheet2Row, mean1));
+		    sheet2Column++;
+		    String std = Double.toString(findStd(actualSuccess, mean));
+		    sheet2.addCell(new Label(sheet2Column,sheet2Row, std));
+		    sheet2Column++;
+			String feasibleString = Integer.toString((int)(100*feasibleRun/ (double) runtimes))+"\\%";
+		    sheet2.addCell(new Label(sheet2Column,sheet2Row, feasibleString));
+		    sheet2Column++;
+			String successRateString = Integer.toString((int)(100*success / (double) runtimes))+"\\%";
+			sheet2.addCell(new Label(sheet2Column,sheet2Row, successRateString));
+			sheet2Column++;
+			String performance = Integer.toString((int)((generation * lambda / (double) success)* (runtimes / (double) success)));
+			sheet2.addCell(new Label(sheet2Column,sheet2Row, performance));
+			sheet2Column++;
+			String line = "\\\\ \\line";
+			sheet2.addCell(new Label(sheet2Column,sheet2Row, line));
+			sheet2Column++;
+		}
+		
+		 bubbleSort(bestValues);
+		 mean = findMean(bestValues);
+		 String min = Double.toString(bestValues[0]);
+		 sheet3.addCell(new Label(sheet3Column,sheet3Row, min));
+		 sheet3Column++;
+		 String median = Double.toString(bestValues[runtimes/2]);
+		 sheet3.addCell(new Label(sheet3Column,sheet3Row, median));
+		 sheet3Column++;
+		 String mean2 = Double.toString(mean);
+		 sheet3.addCell(new Label(sheet3Column,sheet3Row, mean2));
+		 sheet3Column++;
+		 String std = Double.toString(findStd(bestValues, mean));
+		 sheet3.addCell(new Label(sheet3Column,sheet3Row, std));
+		 sheet3Column++;
+		 String max = Double.toString(bestValues[runtimes-1]);
+		 sheet3.addCell(new Label(sheet3Column,sheet3Row, max));
+		 sheet3Column++;
+		 bubbleSort(bestGener);
+		 String optimalG = Double.toString(bestGener[runtimes/2]);
+		 sheet3.addCell(new Label(sheet3Column,sheet3Row, optimalG));
+		 sheet3Column++;
+	}
+	
+	public static void main(String[] args) throws IOException, WriteException {
 		SRES sres = new SRES();
-		double varphis[] = {2,2,2,2,2,2,2,2,2,2,2,2,2,40,2,2,2,2,2,2,2,2,1.5,2,2,2,2,2,2,2,2};
+		double varphis[] = {2,2,2,2,2,2,2,2,2,2,2,2,2,40,2,2,2,2,2,2,2,2,1.5,2,2};
+		
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 设置日期格式
 		System.out.println(df.format(new Date()));// new Date()为获取当前系统时间
 		double optimal[] = { -15.0000000000, -0.8036191041, -1.0005001000,
@@ -3069,16 +2709,14 @@ public class SRES {
 				32.6555929502, 0.2049794002, 193.7245100697, 236.4309755040,
 				-400.0551000000, -5.5080132716, 13.59085, 0,0,0 };
 
-		double optimal10[] = { -0.747310361526121,-2.277702,0,0,0,0,0};
-		double optimal30[] = {-0.821883271394648,-2.169248,0,0,0,0,0,0};
 		int indexf = 1;
-//		System.out.println("instance 01 result");
-//		double luarray1[][] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-//				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 100, 100, 100, 1 } };
-//		sres.setParameters(13, 9, varphis[indexf]);
-//		sres.setlu(luarray1);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//	
+		System.out.println("instance 01 result");
+		double luarray1[][] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 100, 100, 100, 1 } };
+		sres.setParameters(13, 9, varphis[indexf]);
+		sres.setlu(luarray1);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+	
 		indexf = 2;
 		System.out.println("instance 02 result");
 		double luarray2[][] = new double[2][20];
@@ -3091,85 +2729,85 @@ public class SRES {
 		sres.setlu(luarray2);
 		sres.executeInstance(indexf, optimal[indexf-1]);
 
-//		indexf = 3;
-//		System.out.println("instance 03 result");
-//		double luarray3[][] = new double[2][10];
-//		for (int i = 0; i < luarray3.length; i++) {
-//			for (int j = 0; j < luarray3[i].length; j++) {
-//				luarray3[i][j] = i * 1;
-//			}
-//		}
-//		sres.setParameters(10, 1, varphis[indexf]);
-//		sres.setlu(luarray3);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 4;
-//		System.out.println("instance 04 result");
-//		double luarray4[][] = { { 78, 33, 27, 27, 27 }, { 102, 45, 45, 45, 45 } };
-//		sres.setParameters(5, 6, varphis[indexf]);
-//		sres.setlu(luarray4);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 5;
-//		System.out.println("instance 05 result");
-//		double luarray5[][] = { { 0, 0, -0.55, -0.55 },
-//				{ 1200, 1200, 0.55, 0.55 } };
-//		sres.setParameters(4, 5, varphis[indexf]);
-//		sres.setlu(luarray5);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 6;
-//		System.out.println("instance 06 result");
-//		double luarray6[][] = { { 13, 0 }, { 100, 100 } };
-//		sres.setParameters(2, 2, varphis[indexf]);
-//		sres.setlu(luarray6);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 7;
-//		System.out.println("instance 07 result");
-//		double luarray7[][] = new double[2][10];
-//		for (int i = 0; i < luarray7.length; i++) {
-//			for (int j = 0; j < luarray7[i].length; j++) {
-//				luarray7[i][j] = Math.pow(-1, i + 1) * 10;
-//			}
-//		}
-//		sres.setParameters(10, 8, varphis[indexf]);
-//		sres.setlu(luarray7);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 8;
-//		System.out.println("instance 08 result");
-//		double luarray8[][] = { { 0, 0 }, { 10, 10 } };
-//		sres.setParameters(2, 2, varphis[indexf]);
-//		sres.setlu(luarray8);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 9;
-//		System.out.println("instance 09 result");
-//		double luarray9[][] = new double[2][7];
-//		for (int i = 0; i < luarray9.length; i++) {
-//			for (int j = 0; j < luarray9[i].length; j++) {
-//				luarray9[i][j] = -10 * Math.pow(-1, i);
-//			}
-//		}
-//		sres.setParameters(7, 4, varphis[indexf]);
-//		sres.setlu(luarray9);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 10;
-//		System.out.println("instance 10 result");
-//		double luarray10[][] = { { 100, 1000, 1000, 10, 10, 10, 10, 10 },
-//				{ 10000, 10000, 10000, 1000, 1000, 1000, 1000, 1000 } };
-//		sres.setParameters(8, 6, varphis[indexf]);
-//		sres.setlu(luarray10);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 11;
-//		System.out.println("instance 11 result");
-//		double luarray11[][] = { { -1, -1 }, { 1, 1 } };
-//		sres.setParameters(2, 1, varphis[indexf]);
-//		sres.setlu(luarray11);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
+		indexf = 3;
+		System.out.println("instance 03 result");
+		double luarray3[][] = new double[2][10];
+		for (int i = 0; i < luarray3.length; i++) {
+			for (int j = 0; j < luarray3[i].length; j++) {
+				luarray3[i][j] = i * 1;
+			}
+		}
+		sres.setParameters(10, 1, varphis[indexf]);
+		sres.setlu(luarray3);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+
+		indexf = 4;
+		System.out.println("instance 04 result");
+		double luarray4[][] = { { 78, 33, 27, 27, 27 }, { 102, 45, 45, 45, 45 } };
+		sres.setParameters(5, 6, varphis[indexf]);
+		sres.setlu(luarray4);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+
+		indexf = 5;
+		System.out.println("instance 05 result");
+		double luarray5[][] = { { 0, 0, -0.55, -0.55 },
+				{ 1200, 1200, 0.55, 0.55 } };
+		sres.setParameters(4, 5, varphis[indexf]);
+		sres.setlu(luarray5);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+
+		indexf = 6;
+		System.out.println("instance 06 result");
+		double luarray6[][] = { { 13, 0 }, { 100, 100 } };
+		sres.setParameters(2, 2, varphis[indexf]);
+		sres.setlu(luarray6);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+
+		indexf = 7;
+		System.out.println("instance 07 result");
+		double luarray7[][] = new double[2][10];
+		for (int i = 0; i < luarray7.length; i++) {
+			for (int j = 0; j < luarray7[i].length; j++) {
+				luarray7[i][j] = Math.pow(-1, i + 1) * 10;
+			}
+		}
+		sres.setParameters(10, 8, varphis[indexf]);
+		sres.setlu(luarray7);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+
+		indexf = 8;
+		System.out.println("instance 08 result");
+		double luarray8[][] = { { 0, 0 }, { 10, 10 } };
+		sres.setParameters(2, 2, varphis[indexf]);
+		sres.setlu(luarray8);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+
+		indexf = 9;
+		System.out.println("instance 09 result");
+		double luarray9[][] = new double[2][7];
+		for (int i = 0; i < luarray9.length; i++) {
+			for (int j = 0; j < luarray9[i].length; j++) {
+				luarray9[i][j] = -10 * Math.pow(-1, i);
+			}
+		}
+		sres.setParameters(7, 4, varphis[indexf]);
+		sres.setlu(luarray9);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+
+		indexf = 10;
+		System.out.println("instance 10 result");
+		double luarray10[][] = { { 100, 1000, 1000, 10, 10, 10, 10, 10 },
+				{ 10000, 10000, 10000, 1000, 1000, 1000, 1000, 1000 } };
+		sres.setParameters(8, 6, varphis[indexf]);
+		sres.setlu(luarray10);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+
+		indexf = 11;
+		System.out.println("instance 11 result");
+		double luarray11[][] = { { -1, -1 }, { 1, 1 } };
+		sres.setParameters(2, 1, varphis[indexf]);
+		sres.setlu(luarray11);
+		sres.executeInstance(indexf, optimal[indexf-1]);
 
 		indexf = 12;
 		// sres.MaxGen = 500;
@@ -3178,164 +2816,113 @@ public class SRES {
 		sres.setParameters(3, 1, varphis[indexf]);
 		sres.setlu(luarray12);
 		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 13;
-//		System.out.println("instance 13 result");
-//		double luarray13[][] = { { -2.3, -2.3, -3.2, -3.2, -3.2 },
-//				{ 2.3, 2.3, 3.2, 3.2, 3.2 } };
-//		sres.setParameters(5, 3, varphis[indexf]);
-//		sres.setlu(luarray13);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//		
-//		indexf = 14;
-//		System.out.println("instance 14 result");
-//		double luarray14[][] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-//				{ 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 } };
-//		sres.setParameters(10, 3,varphis[indexf]);
-//		sres.setlu(luarray14);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//		
-//		indexf = 15;
-//		System.out.println("instance 15 result");
-//		double luarray15[][] = { { 0, 0, 0 }, { 10, 10, 10 } };
-//		sres.setParameters(3, 2,varphis[indexf]);
-//		sres.setlu(luarray15);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//		
-//		indexf = 16;
-//		System.out.println("instance 16 result");
-//		double luarray16[][] = { { 704.4148, 68.6, 0, 193, 25 },
-//				{ 906.3855, 288.88, 134.75, 287.0966, 84.1988 } };
-//		sres.setParameters(5, 38,varphis[indexf]);
-//		sres.setlu(luarray16);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//		
-//		indexf = 17;
-//		System.out.println("instance 17 result");
-//		double luarray17[][] = { { 0, 0, 340, 340, -1000, 0 },
-//				{ 400, 1000, 420, 420, 1000, 0.5236 } };
-//		sres.setParameters(6, 4,varphis[indexf]);
-//		sres.setlu(luarray17);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//		
-//		indexf = 18;
-//		System.out.println("instance 18 result");
-//		double luarray18[][] = { { -10, -10, -10, -10, -10, -10, -10, -10, 0 },
-//				{ 10, 10, 10, 10, 10, 10, 10, 10, 20 } };
-//		sres.setParameters(9, 13,varphis[indexf]);
-//		sres.setlu(luarray18);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//		
-//		indexf = 19;
-//		System.out.println("instance 19 result");
-//		double luarray19[][] = {
-//				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-//				{ 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 } };
-//		sres.setParameters(15, 5,varphis[indexf]);
-//		sres.setlu(luarray19);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//		
-////		indexf = 20;
-////		System.out.println("instance 20 result");
-////		double luarray20[][] = {
-////				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-////						0, 0, 0, 0 },
-////				{ 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
-////						10, 10, 10, 10, 10, 10, 10, 10, 10 } };
-////		sres.setParameters(24, 20,varphis[indexf]);
-////		sres.setlu(luarray20);
-////		sres.executeInstance(indexf, optimal[indexf-1]);
-//		
-//		indexf = 21;
-//		System.out.println("instance 21 result");
-//		double luarray21[][] = { { 0, 0, 0, 100, 6.3, 5.9, 4.5 },
-//				{ 1000, 40, 40, 300, 6.7, 6.4, 6.25 } };
-//		sres.setParameters(7, 6,varphis[indexf]);
-//		sres.setlu(luarray21);
-//		sres.executeInstance(indexf, optimal[indexf-1]);		
-//	
-//		indexf = 22;
-//		System.out.println("instance 22 result");
-//		double luarray22[][] = {
-//				{ 0, 0, 0, 0, 0, 0, 0, 100, 100, 100.01, 100, 100, 0, 0, 0,
-//						0.01, 0.01, -4.7, -4.7, -4.7, -4.7, -4.7 },
-//				{ 20000, 1 * Math.pow(10, 6), 1 * Math.pow(10, 6),
-//						1 * Math.pow(10, 6), 4 * Math.pow(10, 7),
-//						4 * Math.pow(10, 7), 4 * Math.pow(10, 7), 299.99,
-//						399.99, 300, 400, 600, 500, 500, 500, 300, 400, 6.25,
-//						6.25, 6.25, 6.25, 6.25 } };
-//		sres.setParameters(22, 20,varphis[indexf]);
-//		sres.setlu(luarray22);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 23;
-//		System.out.println("instance 23 result");
-//		double luarray23[][] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0.01 },
-//				{ 300, 300, 100, 200, 100, 300, 100, 200, 0.03 } };
-//		sres.setParameters(9, 6,varphis[indexf]);
-//		sres.setlu(luarray23);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//
-//		indexf = 24;
-//		System.out.println("instance 24 result");
-//		double luarray24[][] = { { 0, 0 }, { 3, 4 } };
-//		sres.setParameters(2, 2,varphis[indexf]);
-//		sres.setlu(luarray24);
-//		sres.executeInstance(indexf, optimal[indexf-1]);
-//			
-		indexf = 25;
-		System.out.println("instance 25 result");
-		sres.setParameters(10, 2,varphis[indexf]);
-		double luarray25[][] = new double[2][sres.variables];
-		for(int i = 0; i < sres.variables; i++){
-			luarray25[0][i] = 0;
-			luarray25[1][i] = 10;
-		}
-		sres.setlu(luarray25);
-		sres.executeInstance(indexf, optimal10[indexf-25]);
+
+		indexf = 13;
+		System.out.println("instance 13 result");
+		double luarray13[][] = { { -2.3, -2.3, -3.2, -3.2, -3.2 },
+				{ 2.3, 2.3, 3.2, 3.2, 3.2 } };
+		sres.setParameters(5, 3, varphis[indexf]);
+		sres.setlu(luarray13);
+		sres.executeInstance(indexf, optimal[indexf-1]);
 		
-//		indexf = 26;
-//		System.out.println("instance 26 result");
-//		sres.setParameters(30, 3,varphis[indexf]);
-//		double luarray26[][] = new double[2][sres.variables];
-//		for(int i = 0; i < sres.variables; i++){
-//			luarray26[0][i] = -5.12;
-//			luarray26[1][i] = 5.12;
-//		}
-//		sres.setlu(luarray26);
-//		sres.executeInstance(indexf, optimal30[indexf-25]);
-//		
-//		indexf = 27;
-//		System.out.println("instance 27 result");
-//		sres.setParameters(10,1,varphis[indexf]);
-//		double luarray27[][] = new double[2][sres.variables];
-//		for(int i = 0; i < sres.variables; i++){
-//			luarray27[0][i] = -1000;
-//			luarray27[1][i] = 1000;
-//		}
-//		sres.setlu(luarray27);
-//		sres.executeInstance(indexf, optimal10[indexf-25]);
+		indexf = 14;
+		System.out.println("instance 14 result");
+		double luarray14[][] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+				{ 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 } };
+		sres.setParameters(10, 3,varphis[indexf]);
+		sres.setlu(luarray14);
+		sres.executeInstance(indexf, optimal[indexf-1]);
 		
-//		indexf = 28;
-//		System.out.println("instance 28 result");
-//		sres.setParameters(2,2,varphis[indexf]);
-//		double luarray28[][] = {{-2,-1},{2,3}};
-//		sres.setlu(luarray28);
-//		sres.executeInstance(indexf, optimal30[indexf-25]);
+		indexf = 15;
+		System.out.println("instance 15 result");
+		double luarray15[][] = { { 0, 0, 0 }, { 10, 10, 10 } };
+		sres.setParameters(3, 2,varphis[indexf]);
+		sres.setlu(luarray15);
+		sres.executeInstance(indexf, optimal[indexf-1]);
 		
-//		indexf = 29;
-//		System.out.println("instance 29 result");
-//		sres.setParameters(7,9,varphis[indexf]);
-//		double luarray29[][] = {{0,0,0,0,0,0,0},{2,2,2,1,1,1,1}};
-//		sres.setlu(luarray29);
-//		sres.executeInstance(indexf, optimal30[indexf-25]);
-//		
-//		indexf = 30;
-//		System.out.println("instance 30 result");
-//		sres.setParameters(5,6,varphis[indexf]);
-//		double luarray30[][] = {{78,33,27,27,27},{102,45,45,45,45}};
-//		sres.setlu(luarray30);
-//		sres.executeInstance(indexf, optimal30[indexf-25]);
+		indexf = 16;
+		System.out.println("instance 16 result");
+		double luarray16[][] = { { 704.4148, 68.6, 0, 193, 25 },
+				{ 906.3855, 288.88, 134.75, 287.0966, 84.1988 } };
+		sres.setParameters(5, 38,varphis[indexf]);
+		sres.setlu(luarray16);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+		
+		indexf = 17;
+		System.out.println("instance 17 result");
+		double luarray17[][] = { { 0, 0, 340, 340, -1000, 0 },
+				{ 400, 1000, 420, 420, 1000, 0.5236 } };
+		sres.setParameters(6, 4,varphis[indexf]);
+		sres.setlu(luarray17);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+		
+		indexf = 18;
+		System.out.println("instance 18 result");
+		double luarray18[][] = { { -10, -10, -10, -10, -10, -10, -10, -10, 0 },
+				{ 10, 10, 10, 10, 10, 10, 10, 10, 20 } };
+		sres.setParameters(9, 13,varphis[indexf]);
+		sres.setlu(luarray18);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+		
+		indexf = 19;
+		System.out.println("instance 19 result");
+		double luarray19[][] = {
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+				{ 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 } };
+		sres.setParameters(15, 5,varphis[indexf]);
+		sres.setlu(luarray19);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+		
+		indexf = 20;
+		System.out.println("instance 20 result");
+		double luarray20[][] = {
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+						0, 0, 0, 0 },
+				{ 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+						10, 10, 10, 10, 10, 10, 10, 10, 10 } };
+		sres.setParameters(24, 20,varphis[indexf]);
+		sres.setlu(luarray20);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+		
+		indexf = 21;
+		System.out.println("instance 21 result");
+		double luarray21[][] = { { 0, 0, 0, 100, 6.3, 5.9, 4.5 },
+				{ 1000, 40, 40, 300, 6.7, 6.4, 6.25 } };
+		sres.setParameters(7, 6,varphis[indexf]);
+		sres.setlu(luarray21);
+		sres.executeInstance(indexf, optimal[indexf-1]);		
+	
+		indexf = 22;
+		System.out.println("instance 22 result");
+		double luarray22[][] = {
+				{ 0, 0, 0, 0, 0, 0, 0, 100, 100, 100.01, 100, 100, 0, 0, 0,
+						0.01, 0.01, -4.7, -4.7, -4.7, -4.7, -4.7 },
+				{ 20000, 1 * Math.pow(10, 6), 1 * Math.pow(10, 6),
+						1 * Math.pow(10, 6), 4 * Math.pow(10, 7),
+						4 * Math.pow(10, 7), 4 * Math.pow(10, 7), 299.99,
+						399.99, 300, 400, 600, 500, 500, 500, 300, 400, 6.25,
+						6.25, 6.25, 6.25, 6.25 } };
+		sres.setParameters(22, 20,varphis[indexf]);
+		sres.setlu(luarray22);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+
+		indexf = 23;
+		System.out.println("instance 23 result");
+		double luarray23[][] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0.01 },
+				{ 300, 300, 100, 200, 100, 300, 100, 200, 0.03 } };
+		sres.setParameters(9, 6,varphis[indexf]);
+		sres.setlu(luarray23);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+
+		indexf = 24;
+		System.out.println("instance 24 result");
+		double luarray24[][] = { { 0, 0 }, { 3, 4 } };
+		sres.setParameters(2, 2,varphis[indexf]);
+		sres.setlu(luarray24);
+		sres.executeInstance(indexf, optimal[indexf-1]);
+		
 		System.out.println(df.format(new Date()));// new Date()为获取当前系统时间
+		sres.book.write();
+		sres.book.close();
 	}
 }
