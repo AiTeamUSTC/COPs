@@ -1,0 +1,7 @@
+/* gradient mutation */
+{ "-g", "enable gradient mutation",
+	OPTION_FLAG, &GradientMutationFlag },
+{ "-gr", "rate of gradient mutation",
+	OPTION_REAL, &GradientMutationRate },
+{ "-gs", "number of gradient calls",
+	OPTION_INTEGER, &GradientSteps },

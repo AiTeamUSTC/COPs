@@ -1,0 +1,382 @@
+/*
+	please add a problem as follows:
+
+	case <problem-no.>:
+	{
+		DEFS={
+			"problem name",
+			#variables, #inequality constraints, #equality constraints,
+			maximization
+		};
+		RANGES={
+			{ min of V1, max of V1 },
+			...
+			{ min of V_n, max of V_n },
+		};
+		BREAK;
+	}
+*/
+
+#undef DEFS
+#undef RANGES
+#undef BREAK
+#define DEFS	static Definition D
+#define RANGES	static Range R[]
+#define BREAK	Defs=&D; Ranges=R; break
+
+case 101: /* g01 */
+case 1:
+{
+	DEFS={
+		"g01", 13, 9, 0, 0, -15.000000
+	};
+	RANGES={
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 100},
+		{0, 100},
+		{0, 100},
+		{0, 1},
+	};
+	BREAK;
+}
+case 102: /* g02 */
+case 2:
+{
+	DEFS={
+		"g02", 20, 2, 0, 1, 0.803619
+	};
+	if(problem==2) {
+		D.maximization=0;
+		D.optimal*=-1;
+	}
+	RANGES={
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+		{0, 10},
+	};
+	BREAK;
+}
+case 103: /* g03 */
+case 3:
+{
+	DEFS={
+		"g03", 10, 0, 1, 1, 1.000000
+	};
+	if(problem==3) {
+		D.maximization=0;
+		D.optimal*=-1;
+	}
+	RANGES={
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+		{0, 1},
+	};
+	BREAK;
+}
+case 104: /* g04 */
+case 4:
+{
+	DEFS={
+		"g04", 5, 6, 0, 0, -30665.538672
+	};
+	RANGES={
+		{ 78, 102 },
+		{ 33, 45 },
+		{ 27, 45 },
+		{ 27, 45 },
+		{ 27, 45 },
+	};
+	BREAK;
+}
+case 105: /* g05 */
+case 5:
+{
+	DEFS={
+		"g05", 4, 2, 3, 0, 5126.498110
+	};
+	RANGES={
+		{0, 1200},
+		{0, 1200},
+		{-0.55, 0.55},
+		{-0.55, 0.55},
+	};
+	BREAK;
+}
+case 106: /* g06 */
+case 6:
+{
+	DEFS={
+		"g06", 2, 2, 0, 0, -6961.813800
+	};
+	RANGES={
+		{13, 100},
+		{ 0, 100},
+	};
+	BREAK;
+}
+case 107: /* g07 */
+case 7:
+{
+	DEFS={
+		"g07", 10, 8, 0, 0, 24.306209
+	};
+	RANGES={
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+	};
+	BREAK;
+}
+case 108: /* g08 */
+case 8:
+{
+	DEFS={
+		"g08", 2, 2, 0, 1, 0.095825
+	};
+	if(problem==8) {
+		D.maximization=0;
+		D.optimal*=-1;
+	}
+	RANGES={
+		{0, 10},
+		{0, 10},
+	};
+	BREAK;
+}
+case 109: /* g09 */
+case 9:
+{
+	DEFS={
+		"g09", 7, 4, 0, 0, 680.630057
+	};
+	RANGES={
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+		{-10, 10},
+	};
+	BREAK;
+}
+case 110: /* g10 */
+case 10:
+{
+	DEFS={
+		"g10", 8, 6, 0, 0, 7049.330700
+	};
+	RANGES={
+		{100, 10000},
+		{1000, 10000},
+		{1000, 10000},
+		{10, 1000},
+		{10, 1000},
+		{10, 1000},
+		{10, 1000},
+		{10, 1000},
+	};
+	BREAK;
+}
+case 111: /* g11 */
+case 11:
+{
+	DEFS={
+		"g11", 2, 0, 1, 0, 0.750000
+	};
+	RANGES={
+		{-1, 1},
+		{-1, 1},
+	};
+	BREAK;
+}
+case 112: /* g12 */
+case 12:
+{
+	DEFS={
+		"g12", 3, 1, 0, 1, 1.000000
+	};
+	if(problem==12) {
+		D.maximization=0;
+		D.optimal*=-1;
+	}
+	RANGES={
+		{0, 10},
+		{0, 10},
+		{0, 10},
+	};
+	BREAK;
+}
+case 113: /* g13 */
+case 13:
+{
+	DEFS={
+		"g13", 5, 0, 3, 0, 0.0539498
+	};
+	RANGES={
+		{-2.3, 2.3},
+		{-2.3, 2.3},
+		{-3.2, 3.2},
+		{-3.2, 3.2},
+		{-3.2, 3.2},
+	};
+	BREAK;
+}
+case 200: /* Himmelblau */
+{
+	DEFS={
+		"Himmelblau", 5, 6, 0, 0
+	};
+	RANGES={
+		{ 78, 102 },
+		{ 33, 45 },
+		{ 27, 45 },
+		{ 27, 45 },
+		{ 27, 45 },
+	};
+	BREAK;
+}
+case 201: /* welded beam design */
+{
+	DEFS={
+		"welded beam design", 4, 7, 0, 0
+	};
+	RANGES={
+		{0.1, 2.0},
+		{0.1, 10.0},
+		{0.1, 10.0},
+		{0.1, 2.0},
+	};
+	BREAK;
+}
+case 202: /* pressure vessel */
+{
+	DEFS={
+		"pressure vessel", 4, 4, 0, 0
+	};
+	RANGES={
+		{1, 99},
+		{1, 99},
+		{10.0, 200.0},
+		{10.0, 200.0},
+	};
+	BREAK;
+}
+case 301: /* Largest-small Polygon Problem */
+{
+	int i;
+#define Nv	Integer
+	DEFS={
+		"polygon", 0, 0, 0, 1
+	};
+	static Range *R;
+
+	if(Nv==0) Nv=50;
+	D.variables=2*(Nv-1);
+	D.inequalities=(Nv/2+1)*(Nv-1)-1;
+
+	Length=D.variables;
+	R=NewRanges();
+	for(i=0; i<Length; i++) {
+		R[i].min=0.0;
+		R[i].max=(i<Nv-1? 1.0 : M_PI);
+	}
+	BREAK;
+#undef Nv
+}
+case 302: /* Distribution of Electrons on a Sphere */ 
+{
+	int i;
+#define Np	Integer
+	DEFS={
+		"electron", 0, 0, 0, 0
+	};
+	static Range *R;
+
+	if(Np==0) Np=100;
+#ifdef SPHERE 
+	D.variables=2*Np;
+#else
+	D.variables=3*Np;
+	D.equalities=Np;
+#endif
+
+	Length=D.variables;
+	R=NewRanges();
+	for(i=0; i<Length; i++) {
+#ifdef SPHERE 
+		R[i].min=0.0;
+		R[i].max=(Length<=Np? 2*M_PI : M_PI);
+#else
+		R[i].min=-1.0;
+		R[i].max=1.0;
+#endif
+	}
+	BREAK;
+#undef Np
+}
+case 303: /* shape optimization of a cam */
+{
+	int i;
+#define N Integer
+#define Rmin 1.0
+#define Rmax 2.0
+	DEFS={
+		"camshape", 0, 0, 0, 1
+	};
+	static Range *R;
+
+	if(N==0) N=800;
+	D.variables=N;
+	D.inequalities=(N+1)+(N+2);
+
+	Length=D.variables;
+	R=NewRanges();
+	for(i=0; i<Length; i++) {
+		R[i].min=Rmin;
+		R[i].max=Rmax;
+	}
+	BREAK;
+#undef N
+#undef Rmin
+#undef Rmax
+}

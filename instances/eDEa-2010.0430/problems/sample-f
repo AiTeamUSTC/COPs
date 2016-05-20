@@ -1,0 +1,159 @@
+/*
+please give an objective function for <problem-no.> as follows:
+case <problem-no.>:
+	f[0]=f;
+	break;
+*/
+case 101: /* g01 */
+case 1:
+	f[0]=(5*(x[0]+x[1]+x[2]+x[3])
+		-5*(square(x[0])+square(x[1])+square(x[2])+square(x[3]))
+		-(x[4]+x[5]+x[6]+x[7]+x[8]+x[9]+x[10]+x[11]+x[12]));
+	break;
+case 102: /* g02 */
+case 2:
+	{ int i; VALUE v1, v2, v3, v, c[Length+1];
+  		for(i=0; i<Length; i++)
+			c[i]=cos(x[i]);
+		v1=v3=0.0; v2=1.0;
+		for(i=0; i<Length; i++) {
+			v=square(c[i]);
+  			v1+=square(v);
+  			v2*=v;
+  			v3+=(i+1)*square(x[i]);
+		}
+		if(Problem==2)
+			f[0]=-fabs((v1-2*v2)/sqrt(v3)); 
+  		else	f[0]=fabs((v1-2*v2)/sqrt(v3)); 
+	}
+	break;
+case 103: /* g03 */
+case 3:
+	{ int i; VALUE s, v;
+		s=sqrt(Length);
+		v=1.0;
+		for(i=0; i<Length; i++)
+			v*=s*x[i];
+		if(Problem==3)
+			f[0]=-(v);
+		else	f[0]=(v);
+	}
+	break;
+case 104: /* g04 */
+case 4:
+  		f[0]=(5.3578547*square(x[2])+0.8356891*x[0]*x[4]+37.293239*x[0]-40792.141);
+	break;
+case 105: /* g05 */
+case 5:
+	f[0]=(3*x[0]+0.000001*cubic(x[0])+2*x[1]+(0.000002/3)*cubic(x[1]));
+	break;
+case 106: /* g06 */
+case 6:
+	{ VALUE v1, v2;
+  			v1=x[0]-10;
+  			v2=x[1]-20;
+  			f[0]=(cubic(v1)+cubic(v2));
+	}
+	break;
+case 107: /* g07 */
+case 7:
+	f[0]=(square(x[0])+square(x[1])+x[0]*x[1]-14*x[0]-16*x[1]+square(x[2]-10)
+	+4*square(x[3]-5)+square(x[4]-3)+2*square(x[5]-1)+5*square(x[6])
+	+7*square(x[7]-11)+2*square(x[8]-10)+square(x[9]-7)+45);
+	break;
+case 108: /* g08 */
+case 8:
+	{ VALUE s1, s2;
+  			s1=sin(2*M_PI*x[0]);
+  			s2=sin(2*M_PI*x[1]);
+			if(Problem==8)
+  				f[0]=-(cubic(s1)*s2/(cubic(x[0])*(x[0]+x[1])));
+  			else	f[0]=(cubic(s1)*s2/(cubic(x[0])*(x[0]+x[1])));
+	}
+	break;
+case 109: /* g09 */
+case 9:
+	f[0]=(square(x[0]-10)+5*square(x[1]-12)+square(x[2]*x[2])+3*square(x[3]-11)
+	+10*square(x[4]*x[4]*x[4])+7*square(x[5])+square(x[6]*x[6])
+	-4*x[5]*x[6]-10*x[5]-8*x[6]);
+	break;
+case 110: /* g10 */
+case 10:
+	f[0]=(x[0]+x[1]+x[2]);
+	break;
+case 111: /* g11 */
+case 11:
+	{ VALUE v2;
+		v2=x[1]-1;
+		f[0]=(square(x[0])+square(v2));
+	}
+	break;
+case 112: /* g12 */
+	f[0]=(100-square(x[0]-5)-square(x[1]-5)-square(x[2]-5))/100;
+	break;
+case 12:
+	f[0]=-(100-square(x[0]-5)-square(x[1]-5)-square(x[2]-5))/100;
+	break;
+case 113: /* g13 */
+case 13:
+	f[0]=(exp(x[0]*x[1]*x[2]*x[3]*x[4]));
+	break;
+case 150: /* test */
+{
+#define hill(x1, x2, w)	exp(-(square(x[0]-x1)+square(x[1]-x2))/w)
+#define HI	1.0
+#define WI	0.2
+	struct { double x1, x2; } p[]={
+		{1,0}, {M_SQRT2/2,M_SQRT2/2}, {0,1}, {-M_SQRT2/2,M_SQRT2/2},
+		{-1,0}, {-M_SQRT2/2,-M_SQRT2/2}, {0,-1}, {M_SQRT2/2,-M_SQRT2/2},
+		};
+	int i;
+	double f1=1.15*hill(0,0,0.01);
+	for(i=0; i<8; i++)
+		f1+=HI*hill(p[i].x1,p[i].x2,WI);
+	f[0]= f1;
+}
+	break;
+case 200: /* Himmelblau */
+	f[0]=(5.3578547*square(x[2])+0.8356891*x[0]*x[4]+37.293239*x[0]-40792.141);
+	break;
+case 201: /* welded beam design */
+	f[0]=(1.10471*square(x[0])*x[1]+0.04811*x[2]*x[3]*(14+x[1]));
+	break;
+case 202: /* pressure vessel */
+{ double Ts, Th;
+	Ts=(int)x[0]*0.0625;
+	Th=(int)x[1]*0.0625;
+	f[0]=(0.6224*Ts*x[2]*x[3]+1.7781*Th*square(x[2])+3.1661*square(Ts)*x[3]+19.84*square(Ts)*x[2]);
+}
+	break;
+case 301: /* largest small polygon */
+{ int i; int Nv=Length/2+1; double *theta=&x[Nv-1], area=0.0;
+#define r x
+	for(i=0; i<Nv-2; i++)
+		area+=r[i+1]*r[i]*sin(theta[i+1]-theta[i]);
+	f[0]= 0.5*area;
+#undef r
+}
+	break;
+case 302: /* Distribution of Electrons on a Sphere */
+{ int i, j; int Np=Length/3; double energy=0.0;
+  VARIABLE *y=&x[Np], *z=&x[Np+Np];
+
+	for(i=0; i<Np-1; i++)
+		for(j=i+1; j<Np; j++)
+			energy+=1.0/sqrt(square(x[i]-x[j])+square(y[i]-y[j])+square(z[i]-z[j]));
+	f[0]= energy;
+}
+	break;
+case 303: /* shape optimization of a cam */
+{ int i; double area=0.0;
+#define N Length
+#define Rv 1.0
+	for(i=0; i<N; i++)
+		area+=x[i];
+	f[0]=(M_PI*Rv*Rv*area/N);
+#undef N
+#undef Rv
+}
+	break;

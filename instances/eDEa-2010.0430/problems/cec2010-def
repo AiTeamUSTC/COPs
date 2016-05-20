@@ -1,0 +1,206 @@
+#undef DEFS
+#undef RANGES
+#undef BREAK
+#define DEFS	static Definition D
+#define RANGES	static Range R[]
+#define BREAK	Defs=&D; break
+#define MINDOUBLE	1e-308
+
+case 1: /* C01 */
+{
+	DEFS={
+		"C01", 30, 2, 0, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=0;
+		Upper=10;
+	}
+	BREAK;
+}
+case 2: /* C02 */
+{
+	DEFS={
+		"C02", 30, 2, 1, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-5.12;
+		Upper=5.12;
+	}
+	BREAK;
+}
+case 3: /* C03 */
+{
+	DEFS={
+		"C03", 30, 0, 1, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-1000;
+		Upper=1000;
+	}
+	BREAK;
+}
+case 4: /* C04 */
+{
+	DEFS={
+		"C04", 30, 0, 4, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-50;
+		Upper=50;
+	}
+	BREAK;
+}
+case 5: /* C05 */
+{
+	DEFS={
+		"C05", 30, 0, 2, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-600;
+		Upper=600;
+	}
+	BREAK;
+}
+case 6: /* C06 */
+{
+	DEFS={
+		"C06", 30, 0, 2, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-600;
+		Upper=600;
+	}
+	BREAK;
+}
+case 7: /* C07 */
+{
+	DEFS={
+		"C07", 30, 1, 0, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-140;
+		Upper=140;
+	}
+	BREAK;
+}
+case 8: /* C08 */
+{
+	DEFS={
+		"C08", 30, 1, 0, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-140;
+		Upper=140;
+	}
+	BREAK;
+}
+case 9: /* C09 */
+{
+	DEFS={
+		"C09", 30, 0, 1, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-500;
+		Upper=500;
+	}
+	BREAK;
+}
+case 10: /* C10 */
+{
+	DEFS={
+		"C10", 30, 0, 1, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-500;
+		Upper=500;
+	}
+	BREAK;
+}
+case 11: /* C11 */
+{
+	DEFS={
+		"C11", 30, 0, 1, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-100;
+		Upper=100;
+	}
+	BREAK;
+}
+case 12: /* C12 */
+{
+	DEFS={
+		"C12", 30, 1, 1, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-1000;
+		Upper=1000;
+	}
+	BREAK;
+}
+case 13: /* C13 */
+{
+	DEFS={
+		"C13", 30, 3, 0, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-500;
+		Upper=500;
+	}
+	BREAK;
+}
+case 14: /* C14 */
+{
+	DEFS={
+		"C14", 30, 3, 0, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-1000;
+		Upper=1000;
+	}
+	BREAK;
+}
+case 15: /* C15 */
+{
+	DEFS={
+		"C15", 30, 3, 0, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-1000;
+		Upper=1000;
+	}
+	BREAK;
+}
+case 16: /* C16 */
+{
+	DEFS={
+		"C16", 30, 2, 2, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-10;
+		Upper=10;
+	}
+	BREAK;
+}
+case 17: /* C17 */
+{
+	DEFS={
+		"C17", 30, 2, 1, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-10;
+		Upper=10;
+	}
+	BREAK;
+}
+case 18: /* C18 */
+{
+	DEFS={
+		"C18", 30, 1, 1, 0, 
+	};
+	if(Upper==Lower) {
+		Lower=-50;
+		Upper=50;
+	}
+	BREAK;
+}

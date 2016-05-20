@@ -1,0 +1,7 @@
+/* epsilon control */
+{ "-e", "enable epsilon control",
+	OPTION_FLAG, &EpsilonFlag },
+{ "-e0r", "top ratio in epsilon(0) of rank-type",
+	OPTION_REAL, &E0_RankRatio },
+{ "-er", "ratio of generations where epsilon is controlled",
+	OPTION_REAL, &EpsilonRatio },

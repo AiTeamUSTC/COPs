@@ -1,0 +1,91 @@
+
+	eDEa: epsilon constraied Differential Evolution with an archive
+		 which can utilize gradient-based mutation optionally
+
+[Copyright notice]
+ Copyright (C) 2010 Tetsuyuki Takahama and Setsuko Sakai
+
+ This software is provided as-is, without warranty of ANY KIND, either
+expressed or implied, including but not limited to the implied warranties
+of merchant ability and/or fitness for a particular purpose. The author
+shall NOT be held liable for ANY damage to you, your computer, or to anyone
+or anything else, that may result from its use, or misuse.
+
+ Permission is hereby granted to use this source code for any purpose,
+without fee, subject to the following restrictions:
+1. This Copyright notice may not be removed or altered.
+2. For scientific use, please cite our publications below
+   when you would publish your publications.
+3. For non scientific purpose, please inform us the objective for using
+   "eDEa" before using the software:
+       E-mail address: takahama@info.hiroshima-cu.ac.jp
+   The reason is that we'd like to know the real applications.
+
+[Publications]
+1. Tetsuyuki Takahama and Setsuko Sakai: "Fast and Stable Constrained Optimization by the epsilon Constrained Differential Evolution", Pacific Journal of Optimization, Vol. 5, No. 2, pp.261-282 (2009.5) 
+2. Tetsuyuki Takahama and Setsuko Sakai: "Constrained Optimization by the epsilon Constrained Differential Evolution with an Archive and Gradient-Based Mutation", Proc. of 2010 IEEE Congress on Evolutionary Computation (CEC2010), 1680-1688 (2010.7)
+
+[Compilation]
+ We compiled this software on CYGWIN for WINDOWS.
+Please don't ask us about the compilation on other systems.
+
+ It needs to install GNU Scientific Library (GSL) before compilation.
+Please don't ask us about GSL and check GSL by yourself.
+
+ In order to solve CEC2010 problems, please download CEC2010 benchmark files from http://www3.ntu.edu.sg/home/epnsugan/index_files/CEC10-Const/CEC10-Const.htm, and copy "fcnsuite.c" or "fcnsuite.dll" under CEC2010 directory.
+ In LINUX systems, please read "Makefile". If you activate "CEC2010 for LINUX" and inactivate "CEC2010 for WINDOWS", you might be able to compile bechmark files.
+
+ If you are lucky, you could use "make" to compile this software
+because a sample "Makefile" is given.
+
+[Usage]
+(A) eDEa
+In order to solve 10D problems, please use the following options:
+	./eDEa -p "ProbID" -pop 1000 -len 10 -gen 5000 -eval 200000
+		-e -e0r 0.9 -g -gr 0.1 -delta 0.0001
+where "ProbID" is selected from 1, 2, ... and 18 for C01, C02, ... and C18.
+Please refer a sample script "scripts/eDEa.sh".
+
+In order to solve 30D problems, please use the following options:
+	./eDEa -p "ProbID" -pop 3000 -len 30 -gen 5000 -eval 600000
+		-e -e0r 0.9 -g -gr 0.1 -delta 0.0001
+
+Help messages are shown by using the "-h" option:
+	./eDEa -h
+
+(B) eDE
+Simplest epsilon constrained DE is also included.
+Please read help message to use it:
+	./DE -h
+For exapmle, you can solve SAMPLEs by compiling with "-DSAMPLES".
+  For problems with inequality constraints only:
+	./DE -p 1 -pop 40 -gen 5000
+  For problems with equality constraints:
+	./DE -p 3 -pop 40 -gen 5000 -e -delta 0.0001
+
+(C) ratio
+A tool for calculating feasibility ratio is included.
+10,000,000 random points are generated within search space and
+the ratio of feasible points will be reported.
+  For example, the feasibility ratio of problem 1 can be obtained:
+	./ratio -p 1
+
+[Information]
+ This software is extracted from eOPT (evolutionary OPTimizer) software.
+eOPT is not opened because many experimental codes are included.
+There would be many variables or definitions which are not used in eDEa,
+because we have no time to brush up eDEa.
+
+ In the epsilon constrained method, the objective function F
+(called by EvaluateF) and constraint function C (called by EvaluateC)
+are called separately in order to omit the evaluation of F.
+ However, in CEC2010 contest F and C are called at the sametime
+(called by EvaluateFC). A macro EVALUATE_FC is defined for the contest
+in order to use EvaluateFC.
+
+ If you'd like to F and C separately, please define EvaluateF and EvaluateC:
+	void EvaluateF(VARIABLE x[], VALUE *f)
+		x is a decision vector, y is the value of F.
+	void EvaluateC(VARIABLE x[], VALUE c[])
+		x is a decision vector, C is the value of G's and H's.
+You need to define some files. Please refer problems/sample-{def,f,gh,nabla}.
